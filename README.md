@@ -35,7 +35,7 @@ package main
 import (
     "encoding/json"
     "fmt"
-    "github.com/feiin/ploto"
+    "github.com/yangyin5127/ploto"
      _ "github.com/go-sql-driver/mysql"
 )
 
@@ -170,7 +170,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/feiin/ploto"
+	"github.com/yangyin5127/ploto"
 	_ "github.com/go-sql-driver/mysql"
 )
 
