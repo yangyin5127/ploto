@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/feiin/sqlstring"
+	"github.com/yangyin5127/sqlstring"
 )
 
 type Tx struct {

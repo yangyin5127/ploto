@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/feiin/sqlstring"
 	"github.com/google/uuid"
+	"github.com/yangyin5127/sqlstring"
 )
 
 type DB struct {
@@ -24,7 +24,7 @@ type RowResult struct {
 	LastError error
 }
 
-//RawDB return the *sql.DB
+// RawDB return the *sql.DB
 func (db *DB) RawDB() *sql.DB {
 	return db.DB
 }
@@ -87,12 +87,12 @@ func (db *DB) ExecContext(ctx context.Context, query string, args ...interface{}
 	return db.DB.ExecContext(ctx, query, args...)
 }
 
-//Close returns the connection to the connection pool
+// Close returns the connection to the connection pool
 func (r RowsResult) Close() error {
 	return r.Rows.Close()
 }
 
-//Scan
+// Scan
 func (r *RowsResult) Scan(dest interface{}) error {
 
 	if r.LastError != nil {
@@ -106,17 +106,17 @@ func (r *RowsResult) Scan(dest interface{}) error {
 	return err
 }
 
-//Raw
+// Raw
 func (r *RowsResult) Raw() (*sql.Rows, error) {
 	return r.Rows, r.LastError
 }
 
-//RowResult return the error of RowResult
+// RowResult return the error of RowResult
 func (r *RowResult) Err() error {
 	return r.LastError
 }
 
-//Scan RowResult's scan
+// Scan RowResult's scan
 func (r *RowResult) Scan(dest interface{}) error {
 
 	if r.LastError != nil {
@@ -149,7 +149,7 @@ func (r *RowResult) Scan(dest interface{}) error {
 	return r.rows.Close()
 }
 
-//Init init all the database clients
+// Init init all the database clients
 func Open(configs DialectConfig, log LoggerInterface) (*Dialect, error) {
 	dialect := &Dialect{}
 	dialect.Clients = make(map[string]*DB)

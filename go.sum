@@ -1,9 +1,9 @@
 github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20OEh60=
 github.com/DATA-DOG/go-sqlmock v1.5.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
-github.com/feiin/sqlstring v0.3.0 h1:iyPEFijI2BxpY2M+AuhIvdNManzXa2OwGzuPaEMLUgo=
-github.com/feiin/sqlstring v0.3.0/go.mod h1:xpZTjVUw1nD3hMgF9SMRdPiooKSikLf4PS5j2NTn3RI=
 github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/yangyin5127/sqlstring v0.3.1 h1:09JyniUyaHj7SqQXmPJRoKZbpzRmDjYU+yUqXI+EMbQ=
+github.com/yangyin5127/sqlstring v0.3.1/go.mod h1:PZ2ADJdPOKgw8QmxTtWcEMO+UDet7WBKgEBKhVZn5AU=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20210921155107-089bfa567519/go.mod h1:GvvjBRRGRdwPK5ydBHafDWAxML/pGHZbMvKqRZ5+Abc=
