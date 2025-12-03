@@ -1,4 +1,4 @@
-module ploto
+module github.com/yangyin5127/ploto
 
 go 1.16
 
