@@ -57,6 +57,8 @@ func initStructValues(item reflect.Value, columns []string, values []interface{}
 	fieldTagMap := make(map[string]reflect.Value, len(columns))
 	initStructFieldTags(item, &fieldTagMap)
 
+	scannerType := reflect.TypeOf((*sql.Scanner)(nil)).Elem()
+
 	for i, column := range columns {
 		var fieldValue reflect.Value
 		if v, ok := fieldTagMap[column]; ok {
@@ -65,11 +67,16 @@ func initStructValues(item reflect.Value, columns []string, values []interface{}
 			fieldValue = item.FieldByName(cases.Title(language.Und, cases.NoLower).String(column))
 		}
 
-		if !fieldValue.CanSet() {
+		if !fieldValue.IsValid() || !fieldValue.CanSet() {
 			values[i] = new(interface{})
 		} else {
-			//*Value
-			values[i] = fieldValue.Addr().Interface()
+			if fieldValue.Kind() == reflect.Ptr && fieldValue.Type().Elem().Implements(scannerType) {
+				values[i] = fieldValue.Interface()
+			} else if fieldValue.Type().Implements(scannerType) {
+				values[i] = fieldValue.Addr().Interface()
+			} else {
+				values[i] = fieldValue.Addr().Interface()
+			}
 		}
 	}
 
