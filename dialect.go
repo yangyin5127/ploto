@@ -63,7 +63,7 @@ func (dialect *Dialect) CreateClient(database string) (db *DB, err error) {
 	case "mysql":
 		dsn = Mysql{}
 	default:
-		dialect.logger.Error(ctx, "connect to mysql database %s with invalid dialect", dbName, dialector)
+		dialect.logger.Error(ctx, "connect to mysql database %s with invalid dialect", dbName)
 		return nil, err
 	}
 
