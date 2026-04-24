@@ -22,6 +22,10 @@ type createUserWithImplicitID struct {
 	Name string `db:"name"`
 }
 
+type createOnlyID struct {
+	ID int64 `db:"id"`
+}
+
 func TestDBCreateAssignsAutoPrimary(t *testing.T) {
 	mockDB, mock, err := sqlmock.New()
 	if err != nil {
@@ -132,6 +136,28 @@ func TestDBCreateTreatsIDColumnAsImplicitAutoPrimary(t *testing.T) {
 
 	if user.ID != 56 {
 		t.Fatalf("implicit id column should be assigned after create")
+	}
+}
+
+func TestDBCreateUsesMySQLEmptyValuesSyntaxWhenOnlyImplicitIDExists(t *testing.T) {
+	mockDB, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("sqlmock.New error: %v", err)
+	}
+	defer mockDB.Close()
+
+	mock.ExpectExec("INSERT INTO `users` \\(\\) VALUES \\(\\)").
+		WillReturnResult(sqlmock.NewResult(78, 1))
+
+	db := &DB{DB: mockDB, dialector: "mysql"}
+	user := &createOnlyID{}
+
+	if _, err := db.Create("users", user); err != nil {
+		t.Fatalf("Create error: %v", err)
+	}
+
+	if user.ID != 78 {
+		t.Fatalf("implicit id should be assigned after create")
 	}
 }
 

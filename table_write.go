@@ -343,7 +343,11 @@ func buildInsertSQL(dialect, table string, fields []createField, autoPrimary *cr
 	}
 
 	if len(columns) == 0 {
-		return fmt.Sprintf("INSERT INTO %s DEFAULT VALUES", quoteIdentifier(dialect, table)), args
+		if strings.ToLower(dialect) == "mysql" {
+			return fmt.Sprintf("INSERT INTO %s () VALUES ()", quoteIdentifier(dialect, table)), args
+		} else {
+			return fmt.Sprintf("INSERT INTO %s DEFAULT VALUES", quoteIdentifier(dialect, table)), args
+		}
 	}
 
 	if autoPrimary != nil && shouldUseReturning(dialect) {
