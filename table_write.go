@@ -273,12 +273,15 @@ func collectCreateFields(value any) ([]createField, *createField, error) {
 			auto:       options["auto"] || options["autoincrement"] || options["auto_increment"],
 		}
 
-		if shouldTreatAsAutoPrimary(field) && fieldValue.CanSet() && fieldValue.IsZero() {
+		if shouldTreatAsAutoPrimary(field) && fieldValue.IsZero() {
 			field.omitInsert = true
-			current := field
-			current.primary = true
-			current.auto = true
-			autoPrimary = &current
+
+			if fieldValue.CanSet() {
+				current := field
+				current.primary = true
+				current.auto = true
+				autoPrimary = &current
+			}
 		}
 
 		fields = append(fields, field)
