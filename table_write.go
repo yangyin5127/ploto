@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-var errCreateValueMustBeStruct = errors.New("create value must be a struct or pointer to struct")
+var errCreateValueMustBeStruct = errors.New("value must be a struct or pointer to struct")
 var errUpdateWhereRequired = errors.New("update where clause is required")
 
 type createField struct {
