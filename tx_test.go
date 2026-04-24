@@ -100,7 +100,6 @@ func TestTransactionRollback(t *testing.T) {
 	}
 
 	result, err := tx.Exec("update users set name='xxxx' WHERE id=1")
-
 	if err != nil {
 		t.Logf("update with error %+v", err)
 		return

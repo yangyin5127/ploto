@@ -104,7 +104,7 @@ func (dialect *Dialect) CreateClient(database string) (db *DB, err error) {
 	}
 
 	//set db to the clients
-	db = &DB{DB: driverDB}
+	db = &DB{DB: driverDB, dialector: dialector}
 
 	if config.Logging != nil {
 		db.LogSql = *config.Logging

@@ -10,8 +10,9 @@ import (
 
 type DB struct {
 	*sql.DB
-	LogSql bool
-	logger LoggerInterface
+	LogSql    bool
+	logger    LoggerInterface
+	dialector string
 }
 
 type RowsResult struct {
