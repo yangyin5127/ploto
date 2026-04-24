@@ -223,6 +223,25 @@ func TestDBUpdateSkipsExplicitPrimaryColumnInSet(t *testing.T) {
 	}
 }
 
+func TestDBUpdateUsesSQLServerPlaceholdersInWhereClause(t *testing.T) {
+	mockDB, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("sqlmock.New error: %v", err)
+	}
+	defer mockDB.Close()
+
+	mock.ExpectExec("UPDATE \\[users\\] SET \\[name\\]=@p1,\\[age\\]=@p2 WHERE user_id=@p3").
+		WithArgs("alice", 18, 12).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
+	db := &DB{DB: mockDB, dialector: "sqlserver"}
+	user := &createUser{UserID: 12, Name: "alice", Age: 18}
+
+	if _, err := db.Update("users", user, "user_id=?", 12); err != nil {
+		t.Fatalf("Update error: %v", err)
+	}
+}
+
 func TestDBUpdateColumns(t *testing.T) {
 	mockDB, mock, err := sqlmock.New()
 	if err != nil {
@@ -249,6 +268,26 @@ func TestDBUpdateColumns(t *testing.T) {
 	}
 	if rowsAffected != 1 {
 		t.Fatalf("RowsAffected should be 1")
+	}
+}
+
+func TestDBUpdateColumnsUsesSQLServerPlaceholdersInWhereClause(t *testing.T) {
+	mockDB, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("sqlmock.New error: %v", err)
+	}
+	defer mockDB.Close()
+
+	mock.ExpectExec("UPDATE \\[users\\] SET \\[age\\]=@p1,\\[name\\]=@p2 WHERE id=@p3").
+		WithArgs(20, "alice", 1).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
+	db := &DB{DB: mockDB, dialector: "sqlserver"}
+	if _, err := db.UpdateColumns("users", map[string]any{
+		"name": "alice",
+		"age":  20,
+	}, "id=?", 1); err != nil {
+		t.Fatalf("UpdateColumns error: %v", err)
 	}
 }
 

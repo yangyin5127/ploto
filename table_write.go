@@ -23,10 +23,27 @@ type createField struct {
 	omitInsert bool
 }
 
+// Create inserts value into table using db tags on exported struct fields.
+//
+// Example:
+//
+//	type User struct {
+//		ID   int64  `db:"id"`
+//		Name string `db:"name"`
+//	}
+//
+//	user := &User{Name: "alice"}
+//	_, err := db.Create("users", user)
 func (db *DB) Create(table string, value any) (sql.Result, error) {
 	return db.CreateContext(context.Background(), table, value)
 }
 
+// CreateContext inserts value into table using db tags on exported struct fields.
+//
+// Example:
+//
+//	ctx := context.Background()
+//	_, err := db.CreateContext(ctx, "users", &User{Name: "alice"})
 func (db *DB) CreateContext(ctx context.Context, table string, value any) (sql.Result, error) {
 	query, args, autoPrimary, err := buildCreateStatement(db.dialector, table, value)
 	if err != nil {
@@ -35,10 +52,21 @@ func (db *DB) CreateContext(ctx context.Context, table string, value any) (sql.R
 	return executeCreate(ctx, db.dialector, autoPrimary, query, args, db.ExecContext, db.QueryRowContext)
 }
 
+// Create inserts value into table within the current transaction.
+//
+// Example:
+//
+//	_, err := tx.Create("users", &User{Name: "alice"})
 func (tx *Tx) Create(table string, value any) (sql.Result, error) {
 	return tx.CreateContext(context.Background(), table, value)
 }
 
+// CreateContext inserts value into table within the current transaction.
+//
+// Example:
+//
+//	ctx := context.Background()
+//	_, err := tx.CreateContext(ctx, "users", &User{Name: "alice"})
 func (tx *Tx) CreateContext(ctx context.Context, table string, value any) (sql.Result, error) {
 	dialect := ""
 	if tx.DB != nil {
@@ -51,10 +79,24 @@ func (tx *Tx) CreateContext(ctx context.Context, table string, value any) (sql.R
 	return executeCreate(ctx, dialect, autoPrimary, query, args, tx.ExecContext, tx.QueryRowContext)
 }
 
+// Update updates table columns from value using db tags on exported struct fields.
+// where is required to avoid updating all rows.
+//
+// Example:
+//
+//	user := &User{ID: 1, Name: "alice"}
+//	_, err := db.Update("users", user, "id=?", user.ID)
 func (db *DB) Update(table string, value any, where string, whereArgs ...any) (sql.Result, error) {
 	return db.UpdateContext(context.Background(), table, value, where, whereArgs...)
 }
 
+// UpdateContext updates table columns from value using db tags on exported struct fields.
+// where is required to avoid updating all rows.
+//
+// Example:
+//
+//	ctx := context.Background()
+//	_, err := db.UpdateContext(ctx, "users", user, "id=?", user.ID)
 func (db *DB) UpdateContext(ctx context.Context, table string, value any, where string, whereArgs ...any) (sql.Result, error) {
 	query, args, err := buildUpdateStatement(db.dialector, table, value, where, whereArgs...)
 	if err != nil {
@@ -63,10 +105,23 @@ func (db *DB) UpdateContext(ctx context.Context, table string, value any, where 
 	return db.ExecContext(ctx, query, args...)
 }
 
+// Update updates table columns from value within the current transaction.
+// where is required to avoid updating all rows.
+//
+// Example:
+//
+//	_, err := tx.Update("users", user, "id=?", user.ID)
 func (tx *Tx) Update(table string, value any, where string, whereArgs ...any) (sql.Result, error) {
 	return tx.UpdateContext(context.Background(), table, value, where, whereArgs...)
 }
 
+// UpdateContext updates table columns from value within the current transaction.
+// where is required to avoid updating all rows.
+//
+// Example:
+//
+//	ctx := context.Background()
+//	_, err := tx.UpdateContext(ctx, "users", user, "id=?", user.ID)
 func (tx *Tx) UpdateContext(ctx context.Context, table string, value any, where string, whereArgs ...any) (sql.Result, error) {
 	dialect := ""
 	if tx.DB != nil {
@@ -148,6 +203,7 @@ func buildUpdateStatement(dialect, table string, value any, where string, whereA
 		return "", nil, errors.New("update value has no columns to set")
 	}
 
+	where = rewriteWherePlaceholders(dialect, where, len(args))
 	query := fmt.Sprintf("UPDATE %s SET %s WHERE %s", quoteIdentifier(dialect, table), strings.Join(setParts, ","), where)
 	for _, arg := range whereArgs {
 		args = append(args, arg)
@@ -186,11 +242,31 @@ func buildUpdateColumnsStatement(dialect, table string, columns map[string]any, 
 		args = append(args, columns[name])
 	}
 
+	where = rewriteWherePlaceholders(dialect, where, len(args))
 	query := fmt.Sprintf("UPDATE %s SET %s WHERE %s", quoteIdentifier(dialect, table), strings.Join(setParts, ","), where)
 	for _, arg := range whereArgs {
 		args = append(args, arg)
 	}
 	return query, args, nil
+}
+
+func rewriteWherePlaceholders(dialect, where string, offset int) string {
+	switch strings.ToLower(dialect) {
+	case "mssql", "sqlserver":
+		var b strings.Builder
+		index := offset
+		for _, ch := range where {
+			if ch == '?' {
+				index++
+				b.WriteString(placeholderForDialect(dialect, index))
+				continue
+			}
+			b.WriteRune(ch)
+		}
+		return b.String()
+	default:
+		return where
+	}
 }
 
 func executeCreate(
